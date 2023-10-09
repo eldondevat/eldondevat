@@ -2,6 +2,8 @@ name: pdflatex resume
 on: [push]
 jobs:
   latex-resume:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -14,7 +16,13 @@ jobs:
         run: |
           curl -LO https://github.com/cmhughes/latexindent.pl/releases/download/V3.23.2/latexindent-linux
           chmod u+x latexindent-linux
-          ./latexindent-linux resume.tex
+          ./latexindent-linux resume.tex >resume-indented.tex
+          mv resume-indented.tex resume.tex
+          git config --global user.email "eldondevat-rgha@eldondev.com"
+          git config --global user.name "Eldonbot"
+          git commit -m "Fix indents" resume.tex
+          git push
+
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         with:
