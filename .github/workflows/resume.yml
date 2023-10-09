@@ -10,6 +10,11 @@ jobs:
         run: "sudo apt update && sudo apt install -y texlive-latex-base  texlive-fonts-recommended texlive-fonts-extra"
       - name: latex build
         run: pdflatex resume.tex
+      - name: latex format
+        run: |
+          curl -LO https://github.com/cmhughes/latexindent.pl/releases/download/V3.23.2/latexindent-linux
+          chmod u+x latexindent-linux
+          ./latexindent-linux resume.tex
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         with:
