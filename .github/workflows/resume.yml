@@ -1,0 +1,12 @@
+name: pdflatex resume
+on: [push]
+jobs:
+  latex-resume:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: "actions/checkout@v4"
+      - name: latex install
+        run: "sudo apt update && sudo apt install -y texlive-latex-base  texlive-fonts-recommended texlive-fonts-extra"
+      - name: latex build
+        run: pdflatex resume.tex
