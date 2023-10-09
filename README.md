@@ -1,4 +1,14 @@
-### Hi there 👋
+### Hi there!
+
+I'm a seasoned software engineer, and you've found my github profile!
+
+So far I've spent the last 15 years writing software and building infrastructure
+for startups. I am a strong believer in the power of effective remote work, and
+the creative and technical benefits of having strong human bonds on technical teams,
+be they community-driven, open source, or business-based.
+
+
+
 
 <!--
 **eldondevat/eldondevat** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
