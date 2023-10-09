@@ -10,3 +10,9 @@ jobs:
         run: "sudo apt update && sudo apt install -y texlive-latex-base  texlive-fonts-recommended texlive-fonts-extra"
       - name: latex build
         run: pdflatex resume.tex
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: pdf
+          path: |
+            resume.pdf
