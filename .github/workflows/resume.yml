@@ -14,6 +14,7 @@ jobs:
         run: pdflatex resume.tex
       - name: latex format
         run: |
+          set -x
           curl -LO https://github.com/cmhughes/latexindent.pl/releases/download/V3.23.2/latexindent-linux
           chmod u+x latexindent-linux
           ./latexindent-linux resume.tex >resume-indented.tex
@@ -22,12 +23,18 @@ jobs:
           git config --global user.name "Eldonbot"
           git diff |grep . >/dev/null && git commit -m "Fix indents" resume.tex
           git push
-          git checkout -B result HEAD
-          git add resume.pdf
-          cp -iv resume.pdf ${GITHUB_SHA}.pdf
+      - name: commit to artifact branch
+        run: |
+          set -x
+          mv resume.pdf ${GITHUB_SHA}.pdf 
+          export NEWREF=$(git log -1 --pretty="%H")
+          git fetch --all
+          git checkout result 
+          git merge $NEWREF
+          cp ${GITHUB_SHA}.pdf resume.pdf 
           git add ${GITHUB_SHA}.pdf resume.pdf
           git commit -m "Committing pdf on branch"
-          git push -fu origin HEAD
+          git push -u origin HEAD
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
