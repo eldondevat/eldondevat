@@ -26,15 +26,15 @@ jobs:
       - name: commit to artifact branch
         run: |
           set -x
-          mv resume.pdf ${GITHUB_SHA}.pdf 
+          mv resume.pdf ${GITHUB_SHA}.pdf
           export NEWREF=$(git log -1 --pretty="%H")
           git fetch --all --unshallow
-          git checkout result 
+          git checkout result
           git log -1 --pretty="%H"
           git status
           git merge $NEWREF || ( set -x && git status  && git diff && git diff --cached )
 
-          cp ${GITHUB_SHA}.pdf resume.pdf 
+          cp ${GITHUB_SHA}.pdf resume.pdf
           git add ${GITHUB_SHA}.pdf resume.pdf
           git commit -m "Committing pdf on branch"
           git push -u origin HEAD
