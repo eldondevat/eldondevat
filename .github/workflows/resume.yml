@@ -28,9 +28,12 @@ jobs:
           set -x
           mv resume.pdf ${GITHUB_SHA}.pdf 
           export NEWREF=$(git log -1 --pretty="%H")
-          git fetch --all
+          git fetch --all --unshallow
           git checkout result 
-          git merge $NEWREF
+          git log -1 --pretty="%H"
+          git status
+          git merge --no-edit --allow-unrelated-histories $NEWREF || ( set -x && git status  && git diff && git diff --cached )
+
           cp ${GITHUB_SHA}.pdf resume.pdf 
           git add ${GITHUB_SHA}.pdf resume.pdf
           git commit -m "Committing pdf on branch"
