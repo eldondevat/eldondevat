@@ -34,7 +34,14 @@ jobs:
           git status
           git merge $NEWREF || ( set -x && git status  && git diff && git diff --cached )
 
+      - name: Also deploy as primary
+        if: ${{  github.ref == 'refs/heads/main' }}
+        run: |
           cp ${GITHUB_SHA}.pdf resume.pdf
+
+
+      - name: commit to artifact branch pt 2
+        run: |
           git add ${GITHUB_SHA}.pdf resume.pdf
           git commit -m "Committing pdf on branch"
           git push -u origin HEAD
