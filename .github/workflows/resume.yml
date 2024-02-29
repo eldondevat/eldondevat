@@ -21,7 +21,7 @@ jobs:
           mv resume-indented.tex resume.tex
           git config --global user.email "eldondevat-rgha@eldondev.com"
           git config --global user.name "Eldonbot"
-          git diff |grep . >/dev/null && git commit -m "Fix indents" resume.tex
+          git diff resume.tex |grep . >/dev/null && git commit -m "Fix indents" resume.tex
           git push
       - name: commit to artifact branch
         run: |
