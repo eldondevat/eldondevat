@@ -8,6 +8,13 @@ the creative and technical benefits of having strong human bonds on technical te
 be they community-driven, open source, or business-based.
 
 
+# FAQs 2024-05-30
+
+> How do I boot QEMU to test an IPXE setup?
+
+I like to build an EFI usb, and test via this comman:
+
+` qemu-system-x86_64 -machine accel=kvm -bios bin-x86_64-efi/OVMF_CODE.fd  -hda bin-x86_64-efi/ipxe.usb  -monitor stdio -m 4g  `
 
 
 <!--
