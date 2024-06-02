@@ -1,11 +1,73 @@
 ### Hi there!
 
-I'm a seasoned software engineer, and you've found my github profile!
+I'm a seasoned software engineer and sysadmin, and you've found my github profile!
 
 So far I've spent the last 15 years writing software and building infrastructure
 for startups. I am a strong believer in the power of effective remote work, and
 the creative and technical benefits of having strong human bonds on technical teams,
 be they community-driven, open source, or business-based.
+
+
+# FAQs 2024-06-02
+
+> How do I enable TLS on my k3s cluster without certmanager?
+
+CertManager is a great utility, but it's not necessary to install it to get letsencrypt certificates in k3s. Traefik, which provides ingress capabilities for k3s, is perfectly capable of negotiating
+`acme` for certificates for you. Additional configuration can be provided to k3s by dropping the following in your installation (with your own email):
+
+```
+$ cat /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    logs:
+      access:
+        enabled: true
+    certResolvers:
+      letsencrypt:
+        email: "$(certificate email)"
+        caServer: https://acme-v02.api.letsencrypt.org/directory # Production server
+        tlsChallenge: true
+```
+
+Then, using the defined certResolver on traefik ingresses (be sure to specify both FQDNs!):
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana
+  namespace: monitoring
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+    traefik.ingress.kubernetes.io/router.tls.domains.0.main: $(your fqdn)
+spec:
+  rules:
+  - host: $(your fqdn)
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus-k8s
+            port:
+              number: 9090
+
+```
+
+Note the certresolver in the ingress annotation is a reference to the certresolver defined in the HelmChartConfig (the token
+being letsencrypt in this case).
+
+Also, notice that this enables access logs for the traefik proxies.
+
+Is this easier than installing CertManager? Not sure, but it's definitely one less moving piece if you
+don't need fullblown certificate management, but just want to expose a few websites.
 
 
 # FAQs 2024-05-31
