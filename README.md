@@ -8,6 +8,36 @@ the creative and technical benefits of having strong human bonds on technical te
 be they community-driven, open source, or business-based.
 
 
+# Triplog 2024-06-03 Ubuntu
+
+Recently I upgraded a machine from Ubuntu release 20.04 to release 22.04. This
+install was migrated to this laptop, where it lives alongsied another Ubuntu
+22.04 release. The core reason (in addition to receiving better regular
+updates,i) was some stuttering that I experienced on google meet calls. It
+seemed less prevalent on zoom, but who knows if that was accurate, or just luck
+of the draw. In the end I switched several things to try to get up to date on
+my Thinkpad P1 Gen3 laptop.
+
+First, and the biggest surprise: despite having run through a
+`do-release-upgrade`, I was still on a 5.15 kernel! I had to uninstall the old
+hardware enablement package and install the new kernel 6.5 hardware enablement
+package.
+
+Second, adding proprietary NVIDIA drivers. The nouveau driver seems to be
+better on the 6.X line of kernels, but I was still experiencing occasional
+artifacts. The NVIDIA drivers seem to have resolved that, but this laptop also
+has an intel graphics card for when battery life is more important than
+performance. I need to verify that the appropriate graphics card is being
+utilized properly, when I was checking the resources in use, it seems that there
+are two possible acceleration APIs, VDPAU and VA-API.
+
+I will test drive this setup for a few meetings (video calls seem to be the
+only things that suffer, and primarily when I am sharing video). However, if I
+don't see improvements, I may need to consider switching to an alternative device
+specifically for these sorts of video calls.
+
+
+
 # FAQs 2024-06-02
 
 > How do I enable TLS on my k3s cluster without certmanager?
