@@ -7,6 +7,56 @@ for startups. I am a strong believer in the power of effective remote work, and
 the creative and technical benefits of having strong human bonds on technical teams,
 be they community-driven, open source, or business-based.
 
+# FAQs 2024-06-11
+
+> How do I enable/disable autologin for a tty?
+
+If you're using a linux machine, you are likely using either systemd, or
+possibly rc-init. Some systems enable autologin in a specific TTY, or allow
+configuration to do so. A good example in Flatcar Linux. If deploying to
+baremetal, or experimenting in a VM, there may be some scenarios where you want
+to be able to administer the system in the short term without configuring SSH
+up front, or even enabling networking.
+
+Another scenario might be persistent VM infrastructure on a laptop. Usually your
+primary OS will be protected by authentication, with encrypted partitions, etc. In
+this scenario, enabling authentication on an internal VM is likely overkill from
+a security perspective, and can be an annoying unnecessary step in your workflow.
+
+It's possible to enable autologin with `agetty` using the `-a <username>` flag, or with
+`login` with `login -f <username>`. Of course, things like gdm also have pam module configurations
+to enable login-by-default.
+
+I would expect most user-facing linux systems today (except android) to utilize systemd,
+in which case you probably have the getty@ service, which can be edited with `systemctl edit getty@.service` for
+any tty, or for a specific tty by putting it after the @ sign (ie, `systemctl edit getty@tty3.service`. This doesn't
+edit the underlying file, but instead is a helper method for generating override.conf files
+in `/etc/systemd/system`. After editing the file, it will be necessary to call `systemctl daemon-reload` and restart the service.
+
+The specific use case that triggered this FAQ was specifying autologin in the
+command line for a particular flatcar linux system booted over ipxe.  Out of
+caution/paranoia, I wanted to disable login after setting up (manually,
+unfortunately) the network on the system. The override file I generated looks like this, and after
+doing the reload dance, the terminal was no longer automatically logging in:
+```
+#/etc/systemd/system/getty\@tty1.service.d/override.conf 
+ExecStart=
+ExecStart=-/sbin/agetty --noclear %I $TERM
+```
+
+I do have some non-systemd systems, and when login is managed by `rc-init`, the
+tty login behavior will likely be managed in the file `/etc/inittab`. Here is
+an exaple of agetty managing the second tty2 for console 2:
+```
+c2:2345:respawn:/sbin/agetty 38400 tty2 linux
+```
+
+To test modifying this behavior, change the file and issue the `telinit q` command. Then
+switch to the console (ctrl+alt+f2 for me), and you will see the change (autologin or whatever).
+
+One useful application of this is USB serial device access to a system with problematic networking,
+which I hope to follow up on in a subsequent FAQ.
+
 
 # Triplog 2024-06-03 Ubuntu
 
@@ -35,8 +85,6 @@ I will test drive this setup for a few meetings (video calls seem to be the
 only things that suffer, and primarily when I am sharing video). However, if I
 don't see improvements, I may need to consider switching to an alternative device
 specifically for these sorts of video calls.
-
-
 
 # FAQs 2024-06-02
 
