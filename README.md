@@ -1,11 +1,73 @@
 ### Hi there!
 
-I'm a seasoned software engineer and sysadmin, and you've found my github profile!
+I'm an experienced software, cloud, and site reliability engineer, and you've
+found my github profile!
 
 So far I've spent the last 15 years writing software and building infrastructure
 for startups. I am a strong believer in the power of effective remote work, and
 the creative and technical benefits of having strong human bonds on technical teams,
-be they community-driven, open source, or business-based.
+be they community-driven, open source, or business-oriented.
+
+# Triplog 2024-06-16 AP9211 Failed upgrade of APC9606
+
+Some years ago, I bought a couple of AP9211 remote power management PDU's. This
+is effectively a large power strip in a rackmountable box. All of the ports are
+standard NEMA 5-15 connectors, which is very convenient if you want to plug in
+some standard sort of gear (say, a fan or something).  These came with AP9606
+network management cards, so you can turn each socket on or off via the network
+(in this case, telnet is the most convenient port, but of course these are
+mostly unsecured, and I wouldn't run one on any sort of network that wasn't
+just a direct connection to a well-secured machine).
+
+While I know this PDU worked at one point, it had been offline for a while, and was already
+20 years old. Unfortunately, when I logged in via telnet, I was met with the following greeting:
+```
+Connected to 10.0.2.10.
+Escape character is '^]'.
+
+User Name : apc
+Password  : ***
+
+
+American Power Conversion               Web/SNMP Management Card AOS     v3.0.3
+(c) Copyright 2000 All Rights Reserved  MasterSwitch APP                 v2.2.0
+-------------------------------------------------------------------------------
+Name      : Unknown                     Date    : 06/16/2024
+Contact   : Unknown                     Time    : 13:50:52
+Location  : Unknown                     Up Time : 0 Days 0 Hours 15 Minutes
+Status    : P+ N+ A-                    User    : Administrator
+
+
+------- Control Console -------------------------------------------------------
+
+     1- Device Manager
+     2- Network
+     3- System
+     4- Logout
+
+     <ESC>- Main Menu, <ENTER>- Refresh
+```
+
+That's right, the `Status:` line containing `A-` indicated that the
+application, which is the bit that actually manages the ports (the whole point
+of this component) was not properly loaded. Amazingly, I don't believe the time there
+was set by NTP, so this device must be properly holding the time 20 years post-manufacture!
+Anyway, the lack of management firmware availability was confirmed when I tried to
+navigate to the Device Manager, and was greeted with an empty menu. When
+operating normally, the device manager should give the option to configure the ports
+in a variety of ways.  Also, connecting via the rudimentary FTP server only
+showed the 303 firmware for the management card. So, what now?
+
+Despite the relatively ancient provenance of this card (the copyright on the
+removable APC AP9606 management board is 1998, but the firmware claims the
+maufacture date is 2000 ), I found some firmware blobs which had been reported
+working in a forum[1].  I attempted an upgrade, but, unfortunately, it failed.
+Of course, that meant I had a good reason to open the unit! Inside, the board
+is a simple one-sided PCB, with one relay per switch, and a standard looking ribbon
+cable connecting to the management card. I dug in and was able to find some resources
+on pinouts, but I also realized that a replacement management card is $10 on ebay, so I'll
+be ordering one of those to test. More to come later!
+
 
 # FAQs 2024-06-11
 
