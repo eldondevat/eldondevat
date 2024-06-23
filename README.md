@@ -8,6 +8,68 @@ for startups. I am a strong believer in the power of effective remote work, and
 the creative and technical benefits of having strong human bonds on technical teams,
 be they community-driven, open source, or business-oriented.
 
+# Triplog 2024-06-20 Vector metrics for Kubernetes clusters with Cron jobs enabled.
+
+I recently realized that there was an outage map for one of our utilities. Very
+interesting.  I like playing with data, so I decided to start collect some
+historical data. A quick inspection of the website showed that there are 2 urls
+which will happily provide JSON data about current outages, so I set about to collect the
+data via a once-a-minute kubernetes cron job. 
+```
+- apiVersion: batch/v1
+  kind: CronJob
+  metadata:
+    name: outages
+    namespace: default
+  spec:
+    concurrencyPolicy: Forbid
+    failedJobsHistoryLimit: 1
+    jobTemplate:
+      metadata:
+        name: outages
+      spec:
+        template:
+          spec:
+            containers:
+            - command:
+              - wget
+              - -qO-
+              - <URL>
+              image: busybox
+              imagePullPolicy: IfNotPresent
+              name: outages
+            restartPolicy: OnFailure
+    schedule: '*/1 * * * *'
+    startingDeadlineSeconds: 10
+    successfulJobsHistoryLimit: 3
+```
+
+The Job starts, the output of the wget command is logged, and then it's done. I
+can pull the relevant log events, and do any kind of analysis on them that I
+want.  This works great, but there are a couple of important elements that are
+worth remembering.  One is the `startingDeadlineSeconds`. I just wanted to skip
+the cronjob if it was delayed, instead of "hammering" the service with
+requests, so I put this at 10 seconds, and I also put `concurrencyPolicy:
+Forbid` for the same reason.
+
+The interesting action I observed is with my use of vector as the logging
+persistence engine in my cluster. It's not complicated, vector just writes logs
+to files in a particular directory right now, which are periodically mirrored
+elsewhere. However, I also collect metrics in a variety of ways, and one of
+them results in output to the same directory. I noticed a consistent increase
+in the size of the contents of the files in this directory, pre-compression.
+The backing reason was that vector keeps metrics of every log stream it
+consumes, and it was recording the tagged log streams of each cron job
+separately. As a result, each tiny cron job would generate new dimensions for a
+metric on the vector instance. Due to the quirks of my metric recording system,
+there would be continued overhead in recording these immobile metrics to
+storage. I found the solution in [a comment on an open issue on the vector
+github repo](https://github.com/vectordotdev/vector/issues/19125#issuecomment-1898627829).
+It was there in the docs the whole time! However, it makes me curious about
+what the real "default behavior" should be, as there are enough comments on
+that issue to suggest that this is a commonly encountered scenario.
+
+
 # Triplog 2024-06-16 AP9211 Failed upgrade of APC9606
 
 Some years ago, I bought a couple of AP9211 remote power management PDU's. This
