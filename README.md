@@ -8,6 +8,12 @@ for startups. I am a strong believer in the power of effective remote work, and
 the creative and technical benefits of having strong human bonds on technical teams,
 be they community-driven, open source, or business-oriented.
 
+# 2024-06-20 A brutal healthcheck
+
+If you would much rather a machine reboot that be uncontactable for any period of time, this is an extreme approach. Hopefully google doesn't go down.
+
+`sudo systemd-run --unit checker --on-calendar='*-*-* *:*:00' -d bash -c 'sysctl -w kernel.sysrq=1 && ping -c10  8.8.8.8 || (echo b |tee -a /proc/sysrq-trigger)'`
+
 # Triplog 2024-06-20 Vector metrics for Kubernetes clusters with Cron jobs enabled.
 
 I recently realized that there was an outage map for one of our utilities. Very
