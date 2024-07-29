@@ -8,7 +8,54 @@ for startups. I am a strong believer in the power of effective remote work, and
 the creative and technical benefits of having strong human bonds on technical teams,
 be they community-driven, open source, or business-oriented.
 
-# 2024-06-20 A brutal healthcheck
+# 2024-07-28 Tofu no disclosure
+
+It's a familiar story these days to have open source tooling sending telemetry back to the
+"guiding organization" that's heading up the development of a piece of tooling. As such, it's
+sometimes enjoyable to me to do a bit of souseveillance to see what trips up expecting to call
+home. One way I do this is via configuration of various proxies in my environments. Another is
+by simply denying the processes any networking at all. A sophisticated adversary will find ways
+around this, but a simple program trying to upload the command you just ran for ~~marketing~~optimization
+purposes will rarely go to those lengths (yet!). So sometimes I simply run `unshare -n` on linux to
+hop into an isolated network namespace. I was doing this recently to experiment with a docker
+host using the community docker-terraform provider and opentofu. Because terraform/tofu want to automatically
+"help" by downloading the providers and managing the state (the old `init` activity), it was causing
+a bit of trouble to be in an isolated network namespace. Here was my solution after some banging:
+
+All of the providers can be downloaded individually. Here is the `local` provider with links in the
+`opentofu` registry: https://github.com/opentofu/registry/blob/main/providers/h/hashicorp/local.json
+I just download the zip files which contain linux binaries, and put them in my /opt/bin folder.
+
+After downloading the appropriate provider, you can let opentofu know to use the provider by putting
+and override in the opentofu config file.
+Here is an example `~/.tofurc`
+```
+provider_installation {
+
+  dev_overrides {
+	"hashicorp/docker" = "/opt/bin"
+	"hashicorp/ct" = "/opt/bin"
+	"hashicorp/local" = "/opt/bin"
+  }
+}
+```
+
+No, I'm not using the docker provider from hashicorp, in this case you can just omit provider
+versioning and config effectively. In my case, my provider configs look like this:
+```
+provider "docker" {
+  host = "unix:///var/run/docker.sock"
+}
+```
+
+I didn't even need a provider block for the ct (config transpiler to turn butane configs into
+ignition configs) or local (just file things) providers.
+
+As a result, I am working with local state in this case, and I actually can't `tofu init`, but `tofu
+plan` and `tofu apply` work well enough.
+
+
+# 2024-07-20 A brutal healthcheck
 
 If you would much rather a machine reboot that be uncontactable for any period of time, this is an extreme approach. Hopefully google doesn't go down.
 
