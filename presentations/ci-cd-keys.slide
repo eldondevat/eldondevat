@@ -1,0 +1,29 @@
+# Easy Workload Identity for CD
+Smooth authentication with GitLab and K3s
+19:00 29 Aug 2024
+Tags: gitlab, k3s, cd, oidc
+Summary: As we deploy more code more frequently, keeping the deploy process smooth is vital. Here we discuss one strategy for connecting the dots without a lot of hassle.
+
+Eldon Stegall
+Senior SRE, Bisect.dev
+eswigl@bisect.dev
+https://bisect.dev
+
+## In the beginning, there was CI
+
+.image hudson.png
+	 // "Easy" to deploy
+	 hudson.war
+	 // easy to find the output
+	 http://jenkins/jobs/job/1234/artifacts
+	 // Easy to hack!
+	 jenkins.xml
+	 Groovy script console!
+
+## I take the jars from the butler
+# and give them to the pet.
+
+
+
+
+
