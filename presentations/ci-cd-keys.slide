@@ -9,6 +9,19 @@ Senior SRE, Bisect.dev
 eswigl@bisect.dev
 https://bisect.dev
 
+## Disclaimer
+
+* This is sort of how things went as I remember them.  
+* Some events my be embellished for dramatic effect.
+* If you had different experiences, speak up!
+
+## In the beginning, there was CI
+
+.image hudson.png
+
+
+##
+
 ## In the beginning, there was CI
 
 .image hudson.png
@@ -20,10 +33,121 @@ https://bisect.dev
 	 jenkins.xml
 	 Groovy script console!
 
+
 ## I take the jars from the butler
-# and give them to the pet.
+and give them to the pet.
 
+.image tomcat.png
 
+Benefits of this deployment strategy
+* Easy to deploy
+* Easy to undeploy
+* Supported by OSS (JBoss)
+* Supported by Enterprise™
 
+## Before long, people were automating
+even more
 
+* rsync/ssh the jar!
+* cron to curl the jar from the artifacts folder!
 
+.image birdtype.gif
+
+##
+
+.image butterfly.png
+
+## Meanwhile
+
+.image amazon-thought.png
+.image aws.png
+
+## Programmatic buying
+
+API Keys were great for programmatic buying,
+but insecure.
+* Compromised if employees left
+* Easy to forget about
+* Easy to leak
+
+## Thus was born IAM
+
+.image iam.png
+
+* Served over IMDS
+* Meant to be short-lived
+* Full access to API
+* Serious boon for the lazy cloud engineer
+
+## Not all workloads should have all access
+
+* Serving cat PNGs =/= starting EC2 instances
+* SSRF FTW
+* Prod data (cat pictures) =/= Staging Data (bird videos) =/= Dog Pictures
+* The world is your rack.
+
+.image racks.png
+
+## Clouds get enterprisey
+
+Suddenly we have the concept that what the code
+can do strongly correlates with which code it is
+and where it's running. 
+
+The concept of workload identity is born.
+
+.image jules-briefcase.png
+
+## Bringing the two together
+
+We want a single pane of glass
+* Keys per-job in "secrets"
+* Runners with distinct instance profiles
+* YOLO
+
+.image hudson.png
+
+## Lots of vendors come to the cloud CI Space
+
+* AWS CodeBuild
+* JenkinsX
+* GitLab
+* GitHub Actions
+
+`
+"Condition": {
+  "StringEquals": {
+    "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+    "token.actions.githubusercontent.com:sub": "repo:octo-org/octo-repo:ref:refs/heads/octo-branch"
+  }
+}
+`
+
+## How to Authenticate
+
+The same way we authenticate people!
+
+.image openid.png
+
+* ephemeral
+* cross-platform
+* well-known security constraints
+
+## Case Study: Gitlab
+
+OIDC token issued by GitLab Server
+
+* Easily configured in .gitlab-ci.yaml
+
+.image gitlab.png
+
+## And Kubernetes
+
+kube-apiserver-arg:
+- "oidc-issuer-url=https://gitlab.gl.go2json.com"
+- "oidc-client-id=https://vault.example.com"
+- "oidc-username-claim=project_path"
+
+## Beta in 1.30
+
+"JWT Authenticator is an authenticator to authenticate Kubernetes users using JWT compliant tokens. The authenticator will attempt to parse a raw ID token, verify it's been signed by the configured issuer. The public key to verify the signature is discovered from the issuer's public endpoint using OIDC discovery."
